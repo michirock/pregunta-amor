@@ -8,12 +8,64 @@ juego_html = """
 <html>
 <head>
     <style>
-        body { text-align: center; font-family: sans-serif; background-color: #f0f0f0; margin: 0; padding: 0; }
-        canvas { background: #70c5ce; display: block; margin: 20px auto; border: 4px solid #333; border-radius: 8px; }
-        #mensaje { font-size: 20px; color: #ff4b4b; font-weight: bold; margin-top: 15px; min-height: 30px; }
-        #final { display: none; font-size: 35px; color: #ff4b4b; font-weight: bold; margin-top: 20px; animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-        .instrucciones { color: #555; font-size: 14px; }
+        body { 
+            text-align: center; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #fdf2f8; 
+            margin: 0; 
+            padding: 0; 
+        }
+        h2 { color: #db2777; margin-top: 10px; }
+        
+        canvas { 
+            display: block; 
+            margin: 15px auto; 
+            border: 5px solid #fff; 
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(219, 39, 119, 0.3);
+        }
+        
+        /* Contenedor de mensajes súper llamativo */
+        #mensaje { 
+            font-size: 22px; 
+            color: #fff; 
+            background: linear-gradient(135deg, #ff758c, #ff7eb3);
+            font-weight: bold; 
+            margin: 15px auto; 
+            padding: 15px 25px;
+            min-height: 35px; 
+            width: 80%;
+            max-width: 500px;
+            border-radius: 20px;
+            box-shadow: 0 6px 15px rgba(255, 117, 140, 0.5);
+            transition: transform 0.1s;
+        }
+        
+        /* Animación para cuando el mensaje cambia */
+        .pop { animation: popAnim 0.4s ease-out; }
+        @keyframes popAnim { 
+            0% { transform: scale(1); } 
+            50% { transform: scale(1.08); } 
+            100% { transform: scale(1); } 
+        }
+        
+        #final { 
+            display: none; 
+            font-size: 38px; 
+            color: #e11d48; 
+            font-weight: 900; 
+            margin-top: 20px; 
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            animation: pulse 1s infinite; 
+        }
+        
+        @keyframes pulse { 
+            0% { transform: scale(1); } 
+            50% { transform: scale(1.05); } 
+            100% { transform: scale(1); } 
+        }
+        
+        .instrucciones { color: #6b7280; font-size: 15px; margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -30,12 +82,13 @@ juego_html = """
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
 
-    // Variables del juego
-    let bird = { x: 50, y: 150, v: 0, g: 0.25, jump: -5.5, r: 12 };
+    // Variables del juego (Físicas más suaves para hacerlo más fácil)
+    let bird = { x: 60, y: 150, v: 0, g: 0.18, jump: -4.8, r: 14 };
     let pipes = [];
     let score = 0;
     let gameActive = false;
     let nivel10Alcanzado = false;
+    let bgOffsetX = 0; // Para mover las nubes
 
     const mensajes = {
         1: "❤️ ¡Cada segundo contigo es mi parte favorita del día!",
@@ -57,12 +110,21 @@ juego_html = """
         gameActive = true;
         nivel10Alcanzado = false;
         document.getElementById("final").style.display = "none";
-        document.getElementById("mensaje").innerText = "¡Vamos Ariana, tú puedes! 🚀";
+        mostrarMensaje("¡Vamos Ariana, tú puedes! 🚀");
+    }
+
+    function mostrarMensaje(texto) {
+        let msgDiv = document.getElementById("mensaje");
+        msgDiv.innerText = texto;
+        // Reiniciar la animación
+        msgDiv.classList.remove("pop");
+        void msgDiv.offsetWidth; // Trigger reflow
+        msgDiv.classList.add("pop");
     }
 
     function spawnPipe() {
-        let gap = 130;
-        let minH = 50;
+        let gap = 200; // ESPACIO MÁS AMPLIO (Antes era 130)
+        let minH = 60;
         let maxH = canvas.height - gap - minH;
         let h = Math.floor(Math.random() * (maxH - minH + 1)) + minH;
         pipes.push({ x: canvas.width, top: h, bottom: canvas.height - h - gap, passed: false });
@@ -79,102 +141,5 @@ juego_html = """
     window.addEventListener("keydown", (e) => { if(e.code === "Space") { bJump(); e.preventDefault(); } });
     canvas.addEventListener("click", bJump);
 
-    function update() {
-        if (gameActive) {
-            bird.v += bird.g;
-            bird.y += bird.v;
-
-            // Colisión suelo/techo
-            if (bird.y + bird.r > canvas.height || bird.y - bird.r < 0) {
-                gameActive = false;
-                document.getElementById("mensaje").innerText = "💥 ¡Ups! Chocaste. Haz clic para reiniciar, Ariana.";
-            }
-
-            // Tuberías
-            if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 200) {
-                spawnPipe();
-            }
-
-            for (let i = pipes.length - 1; i >= 0; i--) {
-                pipes[i].x -= 2;
-
-                // Colisiones con tuberías
-                if (bird.x + bird.r > pipes[i].x && bird.x - bird.r < pipes[i].x + 50) {
-                    if (bird.y - bird.r < pipes[i].top || bird.y + bird.r > canvas.height - pipes[i].bottom) {
-                        gameActive = false;
-                        document.getElementById("mensaje").innerText = "💥 ¡Casi! Inténtalo de nuevo, Ariana.";
-                    }
-                }
-
-                // Sumar puntos
-                if (!pipes[i].passed && pipes[i].x + 50 < bird.x) {
-                    pipes[i].passed = true;
-                    score++;
-                    
-                    if (score >= 10) {
-                        gameActive = false;
-                        nivel10Alcanzado = true;
-                        document.getElementById("mensaje").innerText = "";
-                        document.getElementById("final").style.display = "block";
-                    } else if (mensajes[score]) {
-                        document.getElementById("mensaje").innerText = mensajes[score];
-                    }
-                }
-
-                if (pipes[i].x + 50 < 0) pipes.splice(i, 1);
-            }
-        }
-
-        draw();
-        requestAnimationFrame(update);
-    }
-
-    function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Dibujar Tuberías
-        ctx.fillStyle = "#73bf2e";
-        pipes.forEach(p => {
-            ctx.fillRect(p.x, 0, 50, p.top);
-            ctx.fillRect(p.x, canvas.height - p.bottom, 50, p.bottom);
-        });
-
-        // Dibujar Pájaro (Forma de corazón o ave amarilla)
-        ctx.fillStyle = nivel10Alcanzado ? "#ff4b4b" : "#f1c40f";
-        ctx.beginPath();
-        ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Ojo del pájaro
-        if (!nivel10Alcanzado) {
-            ctx.fillStyle = "#000";
-            ctx.beginPath();
-            ctx.arc(bird.x + 4, bird.y - 4, 2, 0, Math.PI * 2);
-            ctx.fill();
-        }
-
-        // Marcador de Score
-        ctx.fillStyle = "#333";
-        ctx.font = "bold 24px sans-serif";
-        ctx.fillText("Nivel: " + score, 20, 40);
-
-        // Pantalla de inicio
-        if (!gameActive && pipes.length === 0 && !nivel10Alcanzado) {
-            ctx.fillStyle = "rgba(0,0,0,0.3)";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#fff";
-            ctx.font = "20px sans-serif";
-            ctx.textAlign = "center";
-            ctx.fillText("Haz clic aquí para Jugar", canvas.width/2, canvas.height/2);
-            ctx.textAlign = "left"; // reset
-        }
-    }
-
-    update();
-    </script>
-</body>
-</html>
-"""
-
-# Renderizar el juego real dentro de Streamlit usando componentes HTML
-st.components.v1.html(juego_html, height=650)
+    function drawBackground() {
+        //
