@@ -108,7 +108,8 @@ if not st.session_state.acepto:
                 
         else:
             st.error("🚨 Error 404: Botón 'NO' deshabilitado por exceso de terquedad.")
-            st.info("Por favor, presiona el gran botón de la izquierda. 👉❤️")
+            # CAMBIO AQUÍ: Texto adaptado para que tenga sentido tanto en PC como en celular
+            st.info("Por favor, presiona el otro botón ❤️🥰")
 
 # Lógica cuando presiona "SÍ"
 else:
