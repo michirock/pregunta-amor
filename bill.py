@@ -29,7 +29,7 @@ juego_html = """
             border: 5px solid #fff; 
             border-radius: 12px;
             box-shadow: 0 8px 25px rgba(219, 39, 119, 0.3);
-            background: #a6c1ee; /* Color de respaldo */
+            background: #a6c1ee;
         }
         
         #mensaje { 
@@ -72,9 +72,9 @@ juego_html = """
             cursor: pointer;
         }
         
-        /* Animación para que la carta se agrande */
+        /* Animación fluida para abrir la carta */
         .abrir-carta {
-            animation: abrirAnim 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            animation: abrirAnim 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
         @keyframes abrirAnim {
             0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
@@ -90,7 +90,7 @@ juego_html = """
 </head>
 <body>
 
-    <h2>🐦 Flappy Bird: Edición Ariana ❤️</h2>
+    <h2>🐦 Flappy Bird: Edición Amor ❤️</h2>
     <p class="instrucciones">Presiona la <b>Barra Espaciadora</b> o <b>Haz Clic</b> en el cuadro para saltar.</p>
     
     <div class="game-container">
@@ -99,7 +99,7 @@ juego_html = """
         <div id="carta-final">
             <div class="sello">💌</div>
             <div class="texto-te-amo">¡Te amo Ariana! ❤️</div>
-            <div class="reinicio">(Haz clic aquí para volver a volar)</div>
+            <div class="reinicio">(Haz clic aquí para volver a empezar)</div>
         </div>
     </div>
     
@@ -109,13 +109,14 @@ juego_html = """
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
 
-    // FÍSICAS MUCHO MÁS FÁCILES
-    let bird = { x: 60, y: 150, v: 0, g: 0.12, jump: -3.8, r: 14 }; // g más baja = cae más lento
+    // Variables de estado
+    let bird = { x: 100, y: 465, v: 0, g: 0.12, jump: -3.8, r: 14 }; // Empieza en el suelo
     let pipes = [];
     let score = 0;
     let gameActive = false;
-    let nivel10Alcanzado = false;
     let bgOffsetX = 0; 
+    let pipesSpawned = 0;
+    let finalAnimationPhase = 0; // 0: Normal, 1: Volando al centro, 2: Carta abierta
 
     const mensajes = {
         1: "❤️ ¡Cada segundo contigo es mi parte favorita del día!",
@@ -129,20 +130,28 @@ juego_html = """
         9: "🔮 Todo es más hermoso si estás a mi lado."
     };
 
-    function resetGame() {
-        bird.y = 150;
+    function resetGame(iniciarVuelo = true) {
+        bird.x = 100;
+        bird.y = 465; // Reposa en el suelo
         bird.v = 0;
         pipes = [];
         score = 0;
-        gameActive = true;
-        nivel10Alcanzado = false;
+        pipesSpawned = 0;
+        gameActive = false;
+        finalAnimationPhase = 0;
         
         let carta = document.getElementById("carta-final");
         carta.style.display = "none";
         carta.classList.remove("abrir-carta");
-        
         document.getElementById("mensaje").style.display = "block";
-        mostrarMensaje("¡Vamos Ariana, tú puedes! 🚀");
+        
+        if (iniciarVuelo) {
+            gameActive = true;
+            bird.v = bird.jump;
+            mostrarMensaje("¡Vamos mi amor, tú puedes! 🚀");
+        } else {
+            mostrarMensaje("✨ ¡Presiona espacio para empezar a volar! ✨");
+        }
     }
 
     function mostrarMensaje(texto) {
@@ -154,19 +163,32 @@ juego_html = """
     }
 
     function spawnPipe() {
-        let gap = 240; // ESPACIO SÚPER AMPLIO
+        if (pipesSpawned >= 10) return; // No más tuberías después del nivel 10
+
+        let gap = 240; 
         let minH = 50;
         let maxH = canvas.height - gap - minH;
         let h = Math.floor(Math.random() * (maxH - minH + 1)) + minH;
-        pipes.push({ x: canvas.width, top: h, bottom: canvas.height - h - gap, passed: false });
+        
+        pipes.push({ 
+            x: canvas.width, 
+            top: h, 
+            bottom: canvas.height - h - gap, 
+            passed: false,
+            esUltima: (pipesSpawned === 9) // La número 10 es la final
+        });
+        
+        pipesSpawned++;
     }
 
     // Controles
     function bJump() {
-        if (!gameActive && !nivel10Alcanzado) {
-            resetGame();
+        if (finalAnimationPhase === 2) {
+            resetGame(false); // Volver al inicio si ya terminó
+        } else if (!gameActive && finalAnimationPhase === 0) {
+            resetGame(true); // Empezar a volar
         } else if (gameActive) {
-            bird.v = bird.jump;
+            bird.v = bird.jump; // Salto normal
         }
     }
     
@@ -174,9 +196,7 @@ juego_html = """
         if(e.code === "Space") { bJump(); e.preventDefault(); } 
     });
     canvas.addEventListener("click", bJump);
-    
-    // Permitir reiniciar tocando la carta
-    document.getElementById("carta-final").addEventListener("click", resetGame);
+    document.getElementById("carta-final").addEventListener("click", () => resetGame(false));
 
     function drawBackground() {
         let sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
@@ -185,7 +205,7 @@ juego_html = """
         ctx.fillStyle = sky;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        bgOffsetX -= 0.2; // Nubes más lentas
+        bgOffsetX -= 0.2; 
         if (bgOffsetX <= -canvas.width) bgOffsetX = 0;
 
         ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
@@ -199,6 +219,7 @@ juego_html = """
             ctx.beginPath(); ctx.arc(offset + 340, 200, 25, 0, Math.PI*2); ctx.fill();
         }
         
+        // Suelo
         ctx.fillStyle = "#86efac";
         ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
         ctx.fillStyle = "#4ade80";
@@ -210,45 +231,65 @@ juego_html = """
             bird.v += bird.g;
             bird.y += bird.v;
 
+            // Chocar con el suelo/techo
             if (bird.y + bird.r > canvas.height - 20 || bird.y - bird.r < 0) {
                 gameActive = false;
                 mostrarMensaje("💥 ¡Ups! Chocaste. Haz clic para reiniciar, mi amor.");
             }
 
+            // Generar tuberías
             if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 250) {
                 spawnPipe();
             }
 
             for (let i = pipes.length - 1; i >= 0; i--) {
-                pipes[i].x -= 1.4; // TUBERÍAS MÁS LENTAS
+                pipes[i].x -= 1.4; 
 
-                let birdHitboxR = bird.r - 3; // Hitbox permisiva
+                let birdHitboxR = bird.r - 3; 
                 if (bird.x + birdHitboxR > pipes[i].x && bird.x - birdHitboxR < pipes[i].x + 60) {
                     if (bird.y - birdHitboxR < pipes[i].top || bird.y + birdHitboxR > canvas.height - pipes[i].bottom) {
                         gameActive = false;
-                        mostrarMensaje("💥 ¡Casi! Inténtalo de nuevo, Ariana.");
+                        mostrarMensaje("💥 ¡Casi! Inténtalo de nuevo, mi vida.");
                     }
                 }
 
+                // Sumar puntos al pasar
                 if (!pipes[i].passed && pipes[i].x + 60 < bird.x) {
                     pipes[i].passed = true;
                     score++;
                     
                     if (score >= 10) {
-                        gameActive = false;
-                        nivel10Alcanzado = true;
-                        
-                        // Ocultar mensaje inferior y mostrar la CARTA FINAL
+                        gameActive = false; // Detener físicas
+                        finalAnimationPhase = 1; // Iniciar transición suave
                         document.getElementById("mensaje").style.display = "none";
-                        let carta = document.getElementById("carta-final");
-                        carta.style.display = "block";
-                        carta.classList.add("abrir-carta");
                     } else if (mensajes[score]) {
                         mostrarMensaje(mensajes[score]);
                     }
                 }
 
                 if (pipes[i].x + 60 < 0) pipes.splice(i, 1);
+            }
+            
+        } else if (finalAnimationPhase === 1) {
+            // Animación suave hacia el centro
+            let targetX = canvas.width / 2;
+            let targetY = canvas.height / 2;
+            
+            bird.x += (targetX - bird.x) * 0.04;
+            bird.y += (targetY - bird.y) * 0.04;
+            bird.v = 0; // Enderezar el pajarito
+            
+            // Las tuberías restantes siguen desapareciendo
+            for (let i = pipes.length - 1; i >= 0; i--) {
+                pipes[i].x -= 1.4;
+            }
+
+            // Cuando llega al centro, mostrar la carta
+            if (Math.abs(bird.x - targetX) < 1 && Math.abs(bird.y - targetY) < 1) {
+                finalAnimationPhase = 2;
+                let carta = document.getElementById("carta-final");
+                carta.style.display = "block";
+                carta.classList.add("abrir-carta");
             }
         }
 
@@ -260,12 +301,20 @@ juego_html = """
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawBackground();
 
+        // DIBUJAR TUBERÍAS
         pipes.forEach(p => {
             let pipeGrad = ctx.createLinearGradient(p.x, 0, p.x + 60, 0);
-            pipeGrad.addColorStop(0, "#4ade80"); 
-            pipeGrad.addColorStop(0.5, "#22c55e"); 
-            pipeGrad.addColorStop(1, "#16a34a"); 
-            
+            if (p.esUltima) {
+                // Tubería ROJA (Nivel 10)
+                pipeGrad.addColorStop(0, "#fca5a5"); 
+                pipeGrad.addColorStop(0.5, "#ef4444"); 
+                pipeGrad.addColorStop(1, "#b91c1c");
+            } else {
+                // Tuberías VERDES
+                pipeGrad.addColorStop(0, "#4ade80"); 
+                pipeGrad.addColorStop(0.5, "#22c55e"); 
+                pipeGrad.addColorStop(1, "#16a34a"); 
+            }
             ctx.fillStyle = pipeGrad;
             
             ctx.fillRect(p.x, 0, 60, p.top);
@@ -277,11 +326,31 @@ juego_html = """
             ctx.strokeRect(p.x - 5, canvas.height - p.bottom, 70, 25);
         });
 
-        // DIBUJAR PAJARITO MEJORADO (A menos que haya llegado a nivel 10)
-        if (!nivel10Alcanzado) {
+        // CARTA EN EL SUELO (Antes de empezar)
+        if (!gameActive && finalAnimationPhase === 0 && pipes.length === 0) {
+            ctx.save();
+            ctx.translate(bird.x + 28, bird.y + 6); // Frente al pajarito en el pasto
+            
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(-7, -5, 14, 10);
+            ctx.strokeStyle = "#db2777";
+            ctx.lineWidth = 1;
+            ctx.strokeRect(-7, -5, 14, 10);
+            
+            ctx.beginPath(); ctx.moveTo(-7, -5); ctx.lineTo(0, 0); ctx.lineTo(7, -5); ctx.stroke();
+            
+            ctx.fillStyle = "#ef4444"; ctx.font = "8px sans-serif"; ctx.fillText("❤", -3, 3);
+            ctx.restore();
+        }
+
+        // DIBUJAR PAJARITO (Desaparece en fase 2 para dar lugar a la gran carta)
+        if (finalAnimationPhase < 2) {
             ctx.save();
             ctx.translate(bird.x, bird.y);
-            let rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, (bird.v * 0.1)));
+            let rotation = 0;
+            if (gameActive) {
+                rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, (bird.v * 0.1)));
+            }
             ctx.rotate(rotation);
 
             // Cuerpo
@@ -301,7 +370,6 @@ juego_html = """
             ctx.beginPath();
             ctx.arc(4, -4, 3, 0, Math.PI * 2);
             ctx.fill();
-            // Brillo del ojo
             ctx.fillStyle = "#fff";
             ctx.beginPath();
             ctx.arc(5, -5, 1, 0, Math.PI * 2);
@@ -323,34 +391,27 @@ juego_html = """
             ctx.fill();
             ctx.stroke();
 
-            // LA CARTITA EN LAS PATAS/PICO
-            ctx.save();
-            ctx.translate(6, 6); // Posición colgando
-            ctx.rotate(Math.PI / 8);
+            // CARTA VOLADORA (Agarrada en el aire)
+            if (gameActive || finalAnimationPhase === 1) {
+                ctx.save();
+                ctx.translate(6, 6); 
+                ctx.rotate(Math.PI / 8);
+                
+                ctx.fillStyle = "#ffffff";
+                ctx.fillRect(0, 0, 14, 10);
+                ctx.strokeStyle = "#db2777";
+                ctx.lineWidth = 1;
+                ctx.strokeRect(0, 0, 14, 10);
+                
+                ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(7, 5); ctx.lineTo(14, 0); ctx.stroke();
+                
+                ctx.fillStyle = "#ef4444"; ctx.font = "8px sans-serif"; ctx.fillText("❤", 4, 8);
+                ctx.restore(); 
+            }
             
-            // Sobre de la carta
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(0, 0, 14, 10);
-            ctx.strokeStyle = "#db2777";
-            ctx.lineWidth = 1;
-            ctx.strokeRect(0, 0, 14, 10);
+            ctx.restore(); // Fin de pajarito
             
-            // Solapa de la carta
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(7, 5);
-            ctx.lineTo(14, 0);
-            ctx.stroke();
-            
-            // Sello de corazón
-            ctx.fillStyle = "#ef4444";
-            ctx.font = "8px sans-serif";
-            ctx.fillText("❤", 4, 8);
-            
-            ctx.restore(); // Restaurar carta
-            ctx.restore(); // Restaurar pajarito
-            
-            // SÓLO MOSTRAR MARCADOR SI NO HA GANADO
+            // MARCADOR (Solo mostrar si no se ha llegado al centro)
             ctx.fillStyle = "#fff";
             ctx.font = "bold 28px 'Segoe UI', sans-serif";
             ctx.shadowBlur = 5;
@@ -359,8 +420,8 @@ juego_html = """
             ctx.shadowBlur = 0; 
         }
 
-        // Pantalla de inicio
-        if (!gameActive && pipes.length === 0 && !nivel10Alcanzado) {
+        // TEXTO DE INICIO
+        if (!gameActive && pipes.length === 0 && finalAnimationPhase === 0) {
             ctx.fillStyle = "rgba(0,0,0,0.4)";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = "#fff";
@@ -368,13 +429,17 @@ juego_html = """
             ctx.textAlign = "center";
             ctx.shadowBlur = 8;
             ctx.shadowColor = "#000";
-            ctx.fillText("Haz clic o presiona espacio", canvas.width/2, canvas.height/2 - 10);
-            ctx.fillText("para volar ❤️", canvas.width/2, canvas.height/2 + 20);
+            
+            // Subido un poco para no tapar al pajarito en el suelo
+            ctx.fillText("Haz clic o presiona espacio", canvas.width/2, 200);
+            ctx.fillText("para recoger la carta ❤️", canvas.width/2, 230);
             ctx.textAlign = "left"; 
             ctx.shadowBlur = 0;
         }
     }
 
+    // Inicializar sin volar
+    resetGame(false);
     update();
     </script>
 </body>
