@@ -30,8 +30,8 @@ st.markdown(
         color: white;
     }
     </style>
-    """,
-    unsafe_allow_value=True
+   """,
+    unsafe_allow_html=True
 )
 
 # Inicializar estados para saber si intentó decir que NO o si ya dijo que SÍ
