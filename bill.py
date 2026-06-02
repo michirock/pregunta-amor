@@ -1,132 +1,88 @@
 import streamlit as st
+import time
 
-# 1. Configuración de la página
-st.set_page_config(page_title="Pregunta seria...", page_icon="❤️", layout="centered")
+# Configuración de la página
+st.set_page_config(page_title="Para Ariana ❤️", page_icon="🐦", layout="centered")
 
-# CSS personalizado para mantener el alto contraste y los estilos estables
-st.markdown(
-    """
-    <style>
-    .stApp {
-        background-color: #ffe6e6;
-    }
-    h1, h2, h3, p, span, label {
-        color: #1a1a1a !important;
-        font-family: 'Arial', sans-serif;
-    }
-    h1 {
-        text-align: center;
-        font-weight: bold;
-    }
-    /* Estilo gigante personalizado para el nombre */
-    .texto-gigante {
-        font-size: 55px !important;
-        color: #ff1a1a !important;
-        text-align: center;
-        font-weight: 900;
-        letter-spacing: 2px;
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
-    /* Estilo del corazón de dibujo grande */
-    .corazon-grande {
-        font-size: 100px;
-        text-align: center;
-        line-height: 1;
-        margin: 20px 0;
-    }
-    /* Estilo de los botones */
-    div.stButton > button {
-        background-color: #ff4d4d;
-        color: white !important;
-        font-size: 20px;
-        font-weight: bold;
-        border-radius: 10px;
-        width: 100%;
-        border: none;
-        padding: 10px;
-    }
-    div.stButton > button:hover {
-        background-color: #ff1a1a;
-        color: white !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+# Inicializar el estado del juego si no existe
+if 'score' not in st.session_state:
+    st.session_state.score = 0
+if 'game_over' not in st.session_state:
+    st.session_state.game_over = False
 
-# Inicializar los estados en la sesión de Streamlit
-if "intentos_no" not in st.session_state:
-    st.session_state.intentos_no = 0
-if "acepto" not in st.session_state:
-    st.session_state.acepto = False
+# Mensajes de amor para cada nivel (del 1 al 9)
+mensajes = {
+    1: "❤️ ¡Cada segundo contigo es mi parte favorita del día!",
+    2: "✨ Eres la personita que alegra todos mis días.",
+    3: "🌹 Me encantas un poquito más cada vez que te veo.",
+    4: "💫 Juntos somos el mejor equipo del mundo.",
+    5: "🧸 Eres mi pensamiento favorito las 24 horas.",
+    6: "🌙 Si pudiera pedir un deseo, sería estar contigo siempre.",
+    7: "🎵 Mi canción favorita eres tú.",
+    8: "⭐ Tienes la sonrisa más bonita de todo el universo.",
+    9: "🔮 Todo es más hermoso si estás a mi lado."
+}
 
-# Mensaje inicial
-st.write("### ❤️ Hola mi amor... Tengo una pregunta muy importante para ti:")
-st.title("¿Me amas? 🥰")
-st.write("")
+st.title("🐦 Flappy Bird: Edición Ariana")
+st.write("¡Esquiva los obstáculos clonados en la pantalla y llega al nivel 10!")
 
-# Lógica si aún no ha aceptado
-if not st.session_state.acepto:
+# Estilo CSS para la animación del corazón del Nivel 10
+st.markdown("""
+<style>
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+.corazon-abierto {
+    font-size: 100px;
+    text-align: center;
+    animation: pulse 1.5s infinite;
+    cursor: default;
+}
+.mensaje-final {
+    font-size: 40px;
+    color: #ff4b4b;
+    font-weight: bold;
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# Lógica del Juego
+if st.session_state.score < 10:
+    st.subheader(f"Nivel Actual: {st.session_state.score}")
+    
+    # Barra de progreso hacia el nivel 10
+    st.progress(st.session_state.score * 10)
+    
+    # Simulación del salto de Flappy Bird con botones interactivos
     col1, col2 = st.columns(2)
-
     with col1:
-        if st.button("¡SÍ! ❤️"):
-            st.session_state.acepto = True
+        if st.button("🚀 ¡SALTAR OBSTÁCULO!", use_container_width=True):
+            st.session_state.score += 1
+            st.rerun()
+            
+    with col2:
+        if st.button("💥 Chocar (Reiniciar)", use_container_width=True):
+            st.session_state.score = 0
+            st.toast("¡Ups! Volvamos a intentar, Ariana 🐧")
             st.rerun()
 
-    with col2:
-        # Interacciones extendidas para el botón "NO"
-        if st.session_state.intentos_no == 0:
-            if st.button("No 💔"):
-                st.session_state.intentos_no += 1
-                st.rerun()
-                
-        elif st.session_state.intentos_no == 1:
-            st.warning("¿Cómo que no? 🤔 ¡Inténtalo de nuevo!")
-            if st.button("¿Segura? 🥺"):
-                st.session_state.intentos_no += 1
-                st.rerun()
-                
-        elif st.session_state.intentos_no == 2:
-            st.error("Respuesta incorrecta... piénsalo bien. 😜")
-            if st.button("Claro que no... 😭"):
-                st.session_state.intentos_no += 1
-                st.rerun()
-                
-        elif st.session_state.intentos_no == 3:
-            st.error("Es físicamente imposible que no me ames. 🔬")
-            if st.button("Que noooo 😡"):
-                st.session_state.intentos_no += 1
-                st.rerun()
-                
-        elif st.session_state.intentos_no == 4:
-            st.info("Ya gastaste todos tus intentos de 'No'. Tu única opción es ser feliz a mi lado. 😏")
-            if st.button("Oblígame 👁️👄👁️"):
-                st.session_state.intentos_no += 1
-                st.rerun()
-                
-        else:
-            st.error("🚨 Error 404: Botón 'NO' deshabilitado por exceso de terquedad.")
-            # CAMBIO AQUÍ: Texto adaptado para que tenga sentido tanto en PC como en celular
-            st.info("Por favor, presiona el otro botón ❤️🥰")
+    # Mostrar mensajito de amor según el nivel actual
+    if st.session_state.score in mensajes:
+        st.info(mensajes[st.session_state.score])
 
-# Lógica cuando presiona "SÍ"
 else:
-    st.balloons()  # Lluvia de globos interactivas
-    st.success("¡Siiii! Sabía que la respuesta correcta era esa. 😍")
+    # --- NIVEL 10: PANTALLA DE VICTORIA Y ANIMACIÓN ---
+    st.balloons() # Animación nativa de globos celebrando
     
-    # Dibujo de corazón limpio, grande y sin caja negra
-    st.markdown('<div class="corazon-grande">❤️</div>', unsafe_allow_html=True)
+    # Animación del corazón latiendo/abriéndose
+    st.markdown('<div class="corazon-abierto">💖</div>', unsafe_allow_html=True)
+    st.markdown('<div class="mensaje-final">¡TE AMO, ARIANA! 👑❤️</div>', unsafe_allow_html=True)
     
-    # Texto en mayúsculas y gigante solicitado
-    st.markdown('<div class="texto-gigante">TE AMO ARIANA</div>', unsafe_allow_html=True)
-    
-    st.write("### ¡Yo también te amo con todo mi corazón! ❤️")
-    st.write("Gracias por ser la mejor novia del mundo mundial. 🥰")
-    st.write("")
-    
-    if st.button("Empezar de nuevo 🔄"):
-        st.session_state.intentos_no = 0
-        st.session_state.acepto = False
+    st.write("---")
+    if st.button("🔄 Jugar de nuevo"):
+        st.session_state.score = 0
         st.rerun()
