@@ -11,7 +11,7 @@ juego_html = """
         /* Estilos Retro / Pixel Art */
         body { 
             text-align: center; 
-            font-family: 'Courier New', Courier, monospace; /* Fuente retro */
+            font-family: 'Courier New', Courier, monospace; 
             background-color: #fdf2f8; 
             margin: 0; 
             padding: 0; 
@@ -26,24 +26,25 @@ juego_html = """
         
         canvas { 
             display: block; 
-            border: 6px solid #222; /* Borde grueso retro */
-            background: #5c94fc; /* Azul cielo estilo Mario/Retro */
-            box-shadow: 8px 8px 0px rgba(0,0,0,0.2); /* Sombra dura */
-            image-rendering: pixelated; /* Fuerza renderizado de píxeles */
+            border: 6px solid #222; 
+            background: #ff9a9e; /* Color de respaldo del cielo */
+            box-shadow: 8px 8px 0px rgba(219, 39, 119, 0.3); 
+            image-rendering: pixelated; 
         }
         
+        /* Mensajes de Nivel Mejorados (Mayor tamaño y contraste) */
         #mensaje { 
-            font-size: 18px; 
-            color: #fff; 
-            background: #ff758c;
-            border: 4px solid #222;
-            font-weight: bold; 
+            font-size: 22px; 
+            color: #111; /* Contraste oscuro máximo */
+            background: #ffffff; /* Fondo blanco para legibilidad */
+            border: 6px solid #222;
+            font-weight: 900; 
             margin: 15px auto; 
-            padding: 12px 20px;
-            min-height: 30px; 
-            width: 80%;
+            padding: 16px 20px;
+            min-height: 35px; 
+            width: 85%;
             max-width: 500px;
-            box-shadow: 4px 4px 0px #222;
+            box-shadow: 6px 6px 0px #f472b6; /* Sombra retro rosada */
             transition: transform 0.1s;
         }
         
@@ -54,7 +55,7 @@ juego_html = """
             100% { transform: scale(1); } 
         }
         
-        /* Diseño de la Carta Gigante Final Estilo Retro */
+        /* Carta Final Retro */
         #carta-final {
             display: none;
             position: absolute;
@@ -120,7 +121,7 @@ juego_html = """
     <script>
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
-    ctx.imageSmoothingEnabled = false; // CLAVE PARA EL PIXEL ART
+    ctx.imageSmoothingEnabled = false; 
 
     // Variables de estado
     let bird = { x: 100, y: 440, v: 0, g: 0.12, jump: -3.8, r: 14 }; 
@@ -129,17 +130,9 @@ juego_html = """
     let gameActive = false;
     let bgOffsetX = 0; 
     let pipesSpawned = 0;
-    
-    // Fases de animación final
-    // 0: Inicio/Jugando, 1: Acercando casa, 2: Volando al buzón, 3: Cayendo carta, 4: Carta abierta
     let finalPhase = 0; 
     
-    // Objetos de la escena final
-    let endScene = {
-        active: false,
-        x: 0, // Se inicializará cuando lleguemos a nivel 10
-        letterDropY: 0
-    };
+    let endScene = { active: false, x: 0, letterDropY: 0 };
 
     const mensajes = {
         1: "❤️ ¡Cada segundo contigo es mi parte favorita!",
@@ -155,7 +148,7 @@ juego_html = """
 
     function resetGame(iniciarVuelo = true) {
         bird.x = 100;
-        bird.y = 440; // Suelo pixel art
+        bird.y = 440; 
         bird.v = 0;
         pipes = [];
         score = 0;
@@ -191,7 +184,7 @@ juego_html = """
 
         let gap = 220; 
         let minH = 50;
-        let maxH = canvas.height - gap - minH - 40; // Suelo más grueso
+        let maxH = canvas.height - gap - minH - 40; 
         let h = Math.floor(Math.random() * (maxH - minH + 1)) + minH;
         
         pipes.push({ 
@@ -221,7 +214,6 @@ juego_html = """
     canvas.addEventListener("click", bJump);
     document.getElementById("carta-final").addEventListener("click", () => resetGame(false));
 
-    // Utilidad para dibujar bloques con contorno (Estilo Pixel Art)
     function drawPixelBlock(x, y, w, h, fill, stroke="#222") {
         ctx.fillStyle = fill;
         ctx.fillRect(x, y, w, h);
@@ -230,49 +222,59 @@ juego_html = """
         ctx.strokeRect(x, y, w, h);
     }
 
-    function drawBackground() {
-        // Cielo (limpio, color sólido)
-        ctx.fillStyle = "#5c94fc";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Dibujar Árboles de Cerezo
+    function drawCherryTree(x, y) {
+        // Tronco
+        drawPixelBlock(x + 16, y - 40, 12, 40, "#5c4033");
+        // Hojas y pétalos (capas de píxeles)
+        drawPixelBlock(x - 8, y - 60, 60, 25, "#db2777"); // Sombra rosa oscura
+        drawPixelBlock(x - 4, y - 75, 52, 25, "#f472b6"); // Rosa medio
+        drawPixelBlock(x + 4, y - 90, 36, 25, "#fbcfe8"); // Rosa claro superior
+    }
 
-        // Nubes Pixel Art
+    function drawBackground() {
+        // 1. Cielo Atardecer Romántico (Bandas horizontales pixeladas)
+        ctx.fillStyle = "#ff9a9e"; ctx.fillRect(0, 0, canvas.width, 140);
+        ctx.fillStyle = "#fecfef"; ctx.fillRect(0, 140, canvas.width, 140);
+        ctx.fillStyle = "#fdfbfb"; ctx.fillRect(0, 280, canvas.width, 220);
+
+        // Sol Atardecer Pixelado (Cruz/Diamante en bloques)
+        ctx.fillStyle = "#fde047";
+        ctx.fillRect(canvas.width/2 - 40, 180, 80, 80);
+        ctx.fillRect(canvas.width/2 - 50, 190, 100, 60);
+        ctx.fillRect(canvas.width/2 - 60, 200, 120, 40);
+
         let scrollSpeed = (gameActive || finalPhase === 1) ? 1.4 : 0;
         bgOffsetX -= scrollSpeed * 0.2; 
         if (bgOffsetX <= -canvas.width) bgOffsetX = 0;
 
+        // 2. Nubes Pixel Art (Moviéndose lento)
         ctx.fillStyle = "#ffffff";
         for (let i = 0; i < 2; i++) {
             let offset = bgOffsetX + (i * canvas.width);
-            // Nube 1 bloque
             ctx.fillRect(offset + 60, 80, 80, 30);
             ctx.fillRect(offset + 80, 60, 40, 70);
-            // Nube 2 bloque
-            ctx.fillRect(offset + 260, 180, 60, 20);
-            ctx.fillRect(offset + 270, 170, 40, 40);
+            ctx.fillRect(offset + 260, 120, 60, 20);
+            ctx.fillRect(offset + 270, 110, 40, 40);
+        }
+
+        // 3. Árboles de Cerezo en el fondo (Moviéndose velocidad media)
+        let groundY = canvas.height - 40;
+        let treeOffset = (bgOffsetX * 2.5) % 150; 
+        for (let x = treeOffset - 150; x < canvas.width; x += 150) {
+            drawCherryTree(x + 30, groundY);
         }
         
-        // Suelo Pixel Art
-        let groundY = canvas.height - 40;
-        
-        // Base tierra
-        ctx.fillStyle = "#d8a038"; 
-        ctx.fillRect(0, groundY + 12, canvas.width, 28);
-        
-        // Pasto superior
-        ctx.fillStyle = "#54ca2f"; 
-        ctx.fillRect(0, groundY, canvas.width, 12);
-        
-        // Borde negro separador
-        ctx.fillStyle = "#222";
-        ctx.fillRect(0, groundY, canvas.width, 4);
+        // 4. Suelo Pixel Art (Moviéndose rápido)
+        ctx.fillStyle = "#d8a038"; ctx.fillRect(0, groundY + 12, canvas.width, 28);
+        ctx.fillStyle = "#54ca2f"; ctx.fillRect(0, groundY, canvas.width, 12);
+        ctx.fillStyle = "#222"; ctx.fillRect(0, groundY, canvas.width, 4);
 
-        // Patrón de césped animado (cuadritos)
         let grassOffset = (bgOffsetX * 5) % 30;
         ctx.fillStyle = "#3da11d";
         for (let x = grassOffset - 30; x < canvas.width; x += 30) {
             ctx.fillRect(x, groundY + 4, 8, 8);
         }
-        // Detalles de tierra
         ctx.fillStyle = "#c08020";
         for (let x = grassOffset - 30; x < canvas.width; x += 40) {
             ctx.fillRect(x + 10, groundY + 20, 12, 8);
@@ -280,17 +282,14 @@ juego_html = """
         }
     }
 
-    // Dibujar la casita y el buzón (Escena final)
     function drawEndScene() {
         if (!endScene.active) return;
         
         let x = endScene.x;
         let groundY = canvas.height - 40;
 
-        // --- CASITA PIXEL ART ---
-        // Pared blanca
+        // CASITA
         drawPixelBlock(x + 60, groundY - 70, 80, 70, "#fffafa");
-        // Techo rojo
         ctx.fillStyle = "#e11d48";
         ctx.beginPath();
         ctx.moveTo(x + 50, groundY - 70);
@@ -299,24 +298,21 @@ juego_html = """
         ctx.fill();
         ctx.strokeStyle = "#222"; ctx.lineWidth = 4;
         ctx.stroke();
-        // Puerta
+        
         drawPixelBlock(x + 85, groundY - 35, 20, 35, "#a16207");
-        ctx.fillStyle = "#fbbf24"; ctx.fillRect(x + 90, groundY - 20, 4, 4); // perilla
-        // Ventana
+        ctx.fillStyle = "#fbbf24"; ctx.fillRect(x + 90, groundY - 20, 4, 4); 
+        
         drawPixelBlock(x + 115, groundY - 50, 16, 16, "#38bdf8");
-        ctx.fillStyle = "#222"; ctx.fillRect(x + 122, groundY - 50, 2, 16); // marco
+        ctx.fillStyle = "#222"; ctx.fillRect(x + 122, groundY - 50, 2, 16); 
         ctx.fillRect(x + 115, groundY - 43, 16, 2);
 
-        // --- BUZÓN PIXEL ART ---
+        // BUZÓN
         let mailX = x + 10;
-        // Poste
         drawPixelBlock(mailX + 6, groundY - 30, 8, 30, "#737373");
-        // Caja del buzón
         drawPixelBlock(mailX, groundY - 45, 20, 15, "#3b82f6");
-        // Bandera roja
         drawPixelBlock(mailX + 18, groundY - 55, 4, 10, "#ef4444");
 
-        // --- CARTA CAYENDO (Fase 3) ---
+        // CARTA CAYENDO
         if (finalPhase === 3) {
             drawLetter(bird.x + 10, endScene.letterDropY);
         }
@@ -326,12 +322,10 @@ juego_html = """
         ctx.save();
         ctx.translate(x, y);
         drawPixelBlock(-8, -6, 16, 12, "#ffffff");
-        // Sobre
         ctx.strokeStyle = "#222"; ctx.lineWidth = 2;
         ctx.beginPath(); ctx.moveTo(-8, -6); ctx.lineTo(0, 0); ctx.lineTo(8, -6); ctx.stroke();
-        // Corazón pixel
         ctx.fillStyle = "#e11d48";
-        ctx.fillRect(-2, 0, 4, 4);
+        ctx.fillRect(-2, -1, 4, 4);
         ctx.restore();
     }
 
@@ -342,7 +336,6 @@ juego_html = """
             bird.v += bird.g;
             bird.y += bird.v;
 
-            // Chocar con el suelo de textura (-40)
             if (bird.y + bird.r > canvas.height - 40 || bird.y - bird.r < 0) {
                 gameActive = false;
                 mostrarMensaje("💥 ¡Ups! Chocaste. Haz clic para reiniciar.");
@@ -355,10 +348,10 @@ juego_html = """
             for (let i = pipes.length - 1; i >= 0; i--) {
                 pipes[i].x -= scrollSpeed; 
 
-                // Hitbox cuadrada para Pixel Art
-                let hx = bird.x - 10;
+                // Hitbox cuadrada para Pixel Art (Mejorada para el nuevo pájaro)
+                let hx = bird.x - 12;
                 let hy = bird.y - 10;
-                let hw = 20; let hh = 20;
+                let hw = 24; let hh = 20;
 
                 if (hx + hw > pipes[i].x && hx < pipes[i].x + 60) {
                     if (hy < pipes[i].top || hy + hh > canvas.height - pipes[i].bottom) {
@@ -373,10 +366,10 @@ juego_html = """
                     
                     if (score >= 10) {
                         gameActive = false; 
-                        finalPhase = 1; // Inicia secuencia de la casa
+                        finalPhase = 1; 
                         document.getElementById("mensaje").style.display = "none";
                         endScene.active = true;
-                        endScene.x = canvas.width + 50; // Aparece por la derecha
+                        endScene.x = canvas.width + 50; 
                     } else if (mensajes[score]) {
                         mostrarMensaje(mensajes[score]);
                     }
@@ -386,37 +379,31 @@ juego_html = """
             }
             
         } else if (finalPhase === 1) {
-            // Fase 1: La casa se acerca, el pajarito se estabiliza
             bird.v += bird.g;
             bird.y += bird.v;
-            if (bird.y > canvas.height - 120) bird.v = -2; // Mini saltitos para mantenerse
+            if (bird.y > canvas.height - 140) bird.v = -2; 
             
             endScene.x -= scrollSpeed;
             for (let i = pipes.length - 1; i >= 0; i--) { pipes[i].x -= scrollSpeed; }
 
-            // Cuando el buzón está en una buena posición, paramos el scroll
             if (endScene.x <= canvas.width / 2 + 20) {
-                finalPhase = 2; // Ir hacia el buzón
+                finalPhase = 2; 
             }
         } else if (finalPhase === 2) {
-            // Fase 2: Pajarito vuela directo al buzón
-            let targetX = endScene.x - 5; // Arriba del buzón
+            let targetX = endScene.x - 5; 
             let targetY = canvas.height - 40 - 55; 
             
             bird.x += (targetX - bird.x) * 0.05;
             bird.y += (targetY - bird.y) * 0.05;
             
             if (Math.abs(bird.x - targetX) < 2 && Math.abs(bird.y - targetY) < 2) {
-                finalPhase = 3; // Soltar carta
+                finalPhase = 3; 
                 endScene.letterDropY = bird.y + 6;
             }
         } else if (finalPhase === 3) {
-            // Fase 3: Carta cae al buzón
             endScene.letterDropY += 3;
-            // Pajarito hace un saltito feliz
             bird.y += Math.sin(Date.now() / 100) * 1.5;
 
-            // Si la carta entra al buzón
             if (endScene.letterDropY > canvas.height - 40 - 45) {
                 finalPhase = 4;
                 let carta = document.getElementById("carta-final");
@@ -433,36 +420,30 @@ juego_html = """
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawBackground();
 
-        // DIBUJAR TUBERÍAS PIXEL ART
         pipes.forEach(p => {
-            let color = p.esUltima ? "#ef4444" : "#4ade80"; // Rojo o Verde
+            let color = p.esUltima ? "#ef4444" : "#4ade80"; 
             let highlight = p.esUltima ? "#fca5a5" : "#86efac";
             
-            // Cuerpo superior
             drawPixelBlock(p.x, 0, 60, p.top, color);
-            ctx.fillStyle = highlight; ctx.fillRect(p.x + 6, 0, 8, p.top - 4); // Brillo
+            ctx.fillStyle = highlight; ctx.fillRect(p.x + 6, 0, 8, p.top - 4); 
 
-            // Tapa superior
             drawPixelBlock(p.x - 4, p.top - 24, 68, 24, color);
             ctx.fillStyle = highlight; ctx.fillRect(p.x + 2, p.top - 20, 8, 16);
 
-            // Cuerpo inferior
             drawPixelBlock(p.x, canvas.height - p.bottom, 60, p.bottom, color);
             ctx.fillStyle = highlight; ctx.fillRect(p.x + 6, canvas.height - p.bottom + 4, 8, p.bottom);
 
-            // Tapa inferior
             drawPixelBlock(p.x - 4, canvas.height - p.bottom, 68, 24, color);
             ctx.fillStyle = highlight; ctx.fillRect(p.x + 2, canvas.height - p.bottom + 4, 8, 16);
         });
 
         drawEndScene();
 
-        // CARTA EN EL SUELO (Antes de empezar)
         if (!gameActive && finalPhase === 0 && pipes.length === 0) {
-            drawLetter(bird.x + 35, bird.y + 12);
+            drawLetter(bird.x + 38, bird.y + 12);
         }
 
-        // DIBUJAR PAJARITO PIXEL ART
+        // --- PAJARITO REDISEÑADO ---
         ctx.save();
         ctx.translate(bird.x, bird.y);
         
@@ -470,35 +451,43 @@ juego_html = """
         if (gameActive) rot = Math.min(Math.PI / 6, Math.max(-Math.PI / 6, (bird.v * 0.1)));
         ctx.rotate(rot);
 
-        let s = 3; // Escala del pixel art del ave
+        let s = 2.5; // Escala del pajarito
         
-        // Cuerpo (Caja amarilla con borde negro)
-        drawPixelBlock(-4*s, -3*s, 8*s, 7*s, "#fde047");
+        // Cola (Naranja con borde negro manual)
+        ctx.fillStyle = "#222"; ctx.fillRect(-8*s, -2*s, 5*s, 4*s);
+        ctx.fillStyle = "#f97316"; ctx.fillRect(-7*s, -1.5*s, 4*s, 3*s);
+
+        // Pecho/Panza (Blanca) debajo del cuerpo
+        drawPixelBlock(-4*s, 2*s, 8*s, 3*s, "#ffffff");
+
+        // Cuerpo principal (Amarillo)
+        drawPixelBlock(-5*s, -4*s, 10*s, 7*s, "#fde047");
         
         // Ojo
-        ctx.fillStyle = "#222"; ctx.fillRect(1*s, -1.5*s, 1.5*s, 2*s);
+        ctx.fillStyle = "#ffffff"; ctx.fillRect(1*s, -2*s, 3*s, 3*s); // Blanco del ojo
+        ctx.fillStyle = "#222"; ctx.fillRect(2.5*s, -1*s, 1.5*s, 1.5*s); // Pupila
         
-        // Pico
-        drawPixelBlock(4*s, 0, 3*s, 2.5*s, "#f97316");
+        // Pico (Detallado)
+        drawPixelBlock(4*s, 0, 4*s, 3*s, "#f97316");
+        ctx.fillStyle = "#222"; ctx.fillRect(4*s, 1.5*s, 4*s, 0.5*s); // Línea del pico
         
-        // Ala (Movimiento según si sube o baja)
-        let wingY = (bird.v < 0) ? -1*s : 1*s;
-        drawPixelBlock(-3*s, wingY, 4*s, 3*s, "#ffffff");
+        // Ala Animada (Blanca y detallada)
+        let wingY = (bird.v < 0) ? -2*s : 1*s;
+        drawPixelBlock(-3*s, wingY, 5*s, 3.5*s, "#ffffff");
+        ctx.fillStyle = "#cbd5e1"; ctx.fillRect(-2*s, wingY + 2*s, 3*s, 1*s); // Sombra del ala
 
-        // CARTA VOLADORA (Agarrada en el aire, excepto en fase 3 y 4)
+        // CARTA VOLADORA
         if ((gameActive || finalPhase === 1 || finalPhase === 2) && pipes.length > 0 || (finalPhase>0 && finalPhase<3)) {
-            ctx.translate(2*s, 4*s); 
+            ctx.translate(2*s, 5*s); 
             ctx.rotate(Math.PI / 6);
             drawLetter(0, 0);
         }
         ctx.restore(); 
         
-        // MARCADOR PIXEL
+        // MARCADOR
         if (finalPhase < 4) {
             ctx.fillStyle = "#fff";
             ctx.font = "bold 24px 'Courier New', monospace";
-            ctx.shadowBlur = 0;
-            // Borde del texto estilo retro
             ctx.strokeStyle = "#222";
             ctx.lineWidth = 4;
             ctx.strokeText("Nivel: " + score, 15, 35);
@@ -507,13 +496,12 @@ juego_html = """
 
         // TEXTO DE INICIO
         if (!gameActive && pipes.length === 0 && finalPhase === 0) {
-            ctx.fillStyle = "rgba(0,0,0,0.5)";
+            ctx.fillStyle = "rgba(0,0,0,0.4)";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = "#fff";
             ctx.font = "bold 18px 'Courier New', monospace";
             ctx.textAlign = "center";
             
-            // Texto con contorno retro
             ctx.strokeStyle = "#222"; ctx.lineWidth = 4;
             ctx.strokeText("Haz clic o presiona", canvas.width/2, 180);
             ctx.fillText("Haz clic o presiona", canvas.width/2, 180);
