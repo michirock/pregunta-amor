@@ -3,7 +3,7 @@ import streamlit as st
 # 1. Configuración de la página
 st.set_page_config(page_title="Pregunta seria...", page_icon="❤️", layout="centered")
 
-# CSS personalizado para mejorar el contraste (Letras oscuras #1a1a1a)
+# CSS personalizado para mantener el alto contraste y los estilos estables
 st.markdown(
     """
     <style>
@@ -17,6 +17,23 @@ st.markdown(
     h1 {
         text-align: center;
         font-weight: bold;
+    }
+    /* Estilo gigante personalizado para el nombre */
+    .texto-gigante {
+        font-size: 55px !important;
+        color: #ff1a1a !important;
+        text-align: center;
+        font-weight: 900;
+        letter-spacing: 2px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    /* Estilo del corazón de dibujo grande */
+    .corazon-grande {
+        font-size: 100px;
+        text-align: center;
+        line-height: 1;
+        margin: 20px 0;
     }
     /* Estilo de los botones */
     div.stButton > button {
@@ -32,13 +49,6 @@ st.markdown(
     div.stButton > button:hover {
         background-color: #ff1a1a;
         color: white !important;
-    }
-    /* Estilo específico para el bloque del corazón */
-    code {
-        color: #ff3333 !important;
-        font-size: 16px !important;
-        font-weight: bold !important;
-        line-height: 1.2 !important;
     }
     </style>
     """,
@@ -66,7 +76,7 @@ if not st.session_state.acepto:
             st.rerun()
 
     with col2:
-        # 3. Interacciones extendidas para el botón "NO"
+        # Interacciones extendidas para el botón "NO"
         if st.session_state.intentos_no == 0:
             if st.button("No 💔"):
                 st.session_state.intentos_no += 1
@@ -105,27 +115,14 @@ else:
     st.balloons()  # Lluvia de globos interactivas
     st.success("¡Siiii! Sabía que la respuesta correcta era esa. 😍")
     
-    # 2. Corazón ASCII optimizado, simétrico y nítido
-    corazon_perfecto = """
-       ****** ******
-     ********** **********
-   ************* *************
-  *****************************
-  *****************************
-   ***************************
-     ***********************
-       *******************
-         ***************
-           ***********
-             *******
-               ***
-                *
-    """
-    st.code(corazon_perfecto, language="text")
+    # Dibujo de corazón limpio, grande y sin caja negra
+    st.markdown('<div class="corazon-grande">❤️</div>', unsafe_allow_html=True)
+    
+    # Texto en mayúsculas y gigante solicitado
+    st.markdown('<div class="texto-gigante">TE AMO ARIANA</div>', unsafe_allow_html=True)
     
     st.write("### ¡Yo también te amo con todo mi corazón! ❤️")
     st.write("Gracias por ser la mejor novia del mundo mundial. 🥰")
-    st.write("_¡Eres mi bug favorito en este código llamado vida!_ 💻✨")
     st.write("")
     
     if st.button("Empezar de nuevo 🔄"):
