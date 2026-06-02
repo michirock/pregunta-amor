@@ -8,14 +8,15 @@ juego_html = """
 <html>
 <head>
     <style>
+        /* Estilos Retro / Pixel Art */
         body { 
             text-align: center; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-family: 'Courier New', Courier, monospace; /* Fuente retro */
             background-color: #fdf2f8; 
             margin: 0; 
             padding: 0; 
         }
-        h2 { color: #db2777; margin-top: 10px; }
+        h2 { color: #db2777; margin-top: 10px; font-weight: bold; text-transform: uppercase; }
         
         .game-container {
             position: relative;
@@ -25,35 +26,35 @@ juego_html = """
         
         canvas { 
             display: block; 
-            border: 5px solid #fff; 
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(219, 39, 119, 0.3);
-            background: #a6c1ee;
+            border: 6px solid #222; /* Borde grueso retro */
+            background: #5c94fc; /* Azul cielo estilo Mario/Retro */
+            box-shadow: 8px 8px 0px rgba(0,0,0,0.2); /* Sombra dura */
+            image-rendering: pixelated; /* Fuerza renderizado de píxeles */
         }
         
         #mensaje { 
-            font-size: 22px; 
+            font-size: 18px; 
             color: #fff; 
-            background: linear-gradient(135deg, #ff758c, #ff7eb3);
+            background: #ff758c;
+            border: 4px solid #222;
             font-weight: bold; 
             margin: 15px auto; 
-            padding: 15px 25px;
-            min-height: 35px; 
+            padding: 12px 20px;
+            min-height: 30px; 
             width: 80%;
             max-width: 500px;
-            border-radius: 20px;
-            box-shadow: 0 6px 15px rgba(255, 117, 140, 0.5);
+            box-shadow: 4px 4px 0px #222;
             transition: transform 0.1s;
         }
         
         .pop { animation: popAnim 0.4s ease-out; }
         @keyframes popAnim { 
             0% { transform: scale(1); } 
-            50% { transform: scale(1.08); } 
+            50% { transform: scale(1.05); } 
             100% { transform: scale(1); } 
         }
         
-        /* Diseño de la Carta Gigante Final Mejorada */
+        /* Diseño de la Carta Gigante Final Estilo Retro */
         #carta-final {
             display: none;
             position: absolute;
@@ -61,46 +62,42 @@ juego_html = """
             left: 50%;
             transform: translate(-50%, -50%) scale(0);
             background: #fffafa;
-            border: 4px dashed #ff758c;
-            border-radius: 15px;
-            padding: 35px 25px;
+            border: 6px solid #222;
+            padding: 30px 20px;
             width: 320px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            box-shadow: 10px 10px 0px rgba(0,0,0,0.8);
             z-index: 10;
             text-align: center;
             cursor: pointer;
         }
         
         .abrir-carta {
-            animation: abrirAnim 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            animation: abrirAnim 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
         @keyframes abrirAnim {
             0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
             100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         }
 
-        .sello { font-size: 50px; margin-bottom: 5px; line-height: 1; text-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
-        .texto-te-amo { font-size: 28px; color: #e11d48; font-weight: 900; margin-bottom: 10px; }
+        .sello { font-size: 45px; margin-bottom: 5px; line-height: 1; }
+        .texto-te-amo { font-size: 24px; color: #e11d48; font-weight: 900; margin-bottom: 10px; border-bottom: 2px dashed #222; padding-bottom: 5px; }
         
-        /* Estilos del Poema */
         .poema {
-            font-size: 17px;
-            color: #4b5563;
+            font-size: 16px;
+            color: #222;
             margin: 15px 0;
-            font-style: italic;
-            font-family: 'Georgia', serif;
+            font-weight: bold;
             line-height: 1.6;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
         }
 
-        .reinicio { font-size: 13px; color: #888; margin-top: 15px; }
-        .instrucciones { color: #6b7280; font-size: 15px; margin-bottom: 5px; }
+        .reinicio { font-size: 12px; color: #555; margin-top: 15px; font-weight: bold; }
+        .instrucciones { color: #444; font-size: 14px; margin-bottom: 5px; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <h2>🐦 Flappy Bird: Edición Amor ❤️</h2>
-    <p class="instrucciones">Presiona la <b>Barra Espaciadora</b> o <b>Haz Clic</b> en el cuadro para saltar.</p>
+    <p class="instrucciones">Presiona la [BARRA ESPACIADORA] o [CLIC] para saltar.</p>
     
     <div class="game-container">
         <canvas id="canvas" width="400" height="500"></canvas>
@@ -112,9 +109,9 @@ juego_html = """
                 Eres el cielo donde aprendí a volar,<br>
                 la melodía que no dejo de cantar.<br>
                 En cada latido y en cada mañana,<br>
-                mi nivel favorito siempre eres tú, Ariana.
+                mi persona favorita siempre eres tú, Ariana.
             </div>
-            <div class="reinicio">(Haz clic aquí para volver a empezar)</div>
+            <div class="reinicio">[ Haz clic aquí para volver a empezar ]</div>
         </div>
     </div>
     
@@ -123,37 +120,49 @@ juego_html = """
     <script>
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
+    ctx.imageSmoothingEnabled = false; // CLAVE PARA EL PIXEL ART
 
     // Variables de estado
-    let bird = { x: 100, y: 456, v: 0, g: 0.12, jump: -3.8, r: 14 }; 
+    let bird = { x: 100, y: 440, v: 0, g: 0.12, jump: -3.8, r: 14 }; 
     let pipes = [];
     let score = 0;
     let gameActive = false;
     let bgOffsetX = 0; 
     let pipesSpawned = 0;
-    let finalAnimationPhase = 0; 
+    
+    // Fases de animación final
+    // 0: Inicio/Jugando, 1: Acercando casa, 2: Volando al buzón, 3: Cayendo carta, 4: Carta abierta
+    let finalPhase = 0; 
+    
+    // Objetos de la escena final
+    let endScene = {
+        active: false,
+        x: 0, // Se inicializará cuando lleguemos a nivel 10
+        letterDropY: 0
+    };
 
     const mensajes = {
-        1: "❤️ ¡Cada segundo contigo es mi parte favorita del día!",
-        2: "✨ Eres la personita que alegra todos mis días.",
-        3: "🌹 Me encantas un poquito más cada vez que te veo.",
-        4: "💫 Juntos somos el mejor equipo del mundo.",
-        5: "🧸 Eres mi pensamiento favorito las 24 horas.",
-        6: "🌙 Si pudiera pedir un deseo, sería estar contigo siempre.",
+        1: "❤️ ¡Cada segundo contigo es mi parte favorita!",
+        2: "✨ Eres la personita que alegra mis días.",
+        3: "🌹 Me encantas un poquito más cada vez.",
+        4: "💫 Juntos somos el mejor equipo.",
+        5: "🧸 Eres mi pensamiento favorito.",
+        6: "🌙 Mi mayor deseo es estar contigo siempre.",
         7: "🎵 Mi canción favorita eres tú.",
-        8: "⭐ Tienes la sonrisa más bonita de todo el universo.",
-        9: "🔮 Todo es más hermoso si estás a mi lado."
+        8: "⭐ Tienes la sonrisa más bonita.",
+        9: "🔮 Todo es más hermoso a tu lado."
     };
 
     function resetGame(iniciarVuelo = true) {
         bird.x = 100;
-        bird.y = 456; // Ajustado para el nuevo nivel de la tierra
+        bird.y = 440; // Suelo pixel art
         bird.v = 0;
         pipes = [];
         score = 0;
         pipesSpawned = 0;
         gameActive = false;
-        finalAnimationPhase = 0;
+        finalPhase = 0;
+        endScene.active = false;
         
         let carta = document.getElementById("carta-final");
         carta.style.display = "none";
@@ -180,9 +189,9 @@ juego_html = """
     function spawnPipe() {
         if (pipesSpawned >= 10) return; 
 
-        let gap = 240; 
+        let gap = 220; 
         let minH = 50;
-        let maxH = canvas.height - gap - minH - 30; // -30 por la tierra
+        let maxH = canvas.height - gap - minH - 40; // Suelo más grueso
         let h = Math.floor(Math.random() * (maxH - minH + 1)) + minH;
         
         pipes.push({ 
@@ -197,9 +206,9 @@ juego_html = """
     }
 
     function bJump() {
-        if (finalAnimationPhase === 2) {
+        if (finalPhase === 4) {
             resetGame(false); 
-        } else if (!gameActive && finalAnimationPhase === 0) {
+        } else if (!gameActive && finalPhase === 0) {
             resetGame(true); 
         } else if (gameActive) {
             bird.v = bird.jump; 
@@ -212,94 +221,147 @@ juego_html = """
     canvas.addEventListener("click", bJump);
     document.getElementById("carta-final").addEventListener("click", () => resetGame(false));
 
+    // Utilidad para dibujar bloques con contorno (Estilo Pixel Art)
+    function drawPixelBlock(x, y, w, h, fill, stroke="#222") {
+        ctx.fillStyle = fill;
+        ctx.fillRect(x, y, w, h);
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x, y, w, h);
+    }
+
     function drawBackground() {
-        // Cielo
-        let sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        sky.addColorStop(0, "#fbc2eb"); 
-        sky.addColorStop(1, "#a6c1ee"); 
-        ctx.fillStyle = sky;
+        // Cielo (limpio, color sólido)
+        ctx.fillStyle = "#5c94fc";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Brillo del Sol romántico
-        let sunGrad = ctx.createRadialGradient(canvas.width/2, 280, 10, canvas.width/2, 280, 150);
-        sunGrad.addColorStop(0, "rgba(255, 255, 255, 0.7)");
-        sunGrad.addColorStop(0.4, "rgba(253, 224, 71, 0.3)");
-        sunGrad.addColorStop(1, "rgba(253, 224, 71, 0)");
-        ctx.fillStyle = sunGrad;
-        ctx.beginPath();
-        ctx.arc(canvas.width/2, 280, 150, 0, Math.PI*2);
-        ctx.fill();
-
-        bgOffsetX -= 0.2; 
+        // Nubes Pixel Art
+        let scrollSpeed = (gameActive || finalPhase === 1) ? 1.4 : 0;
+        bgOffsetX -= scrollSpeed * 0.2; 
         if (bgOffsetX <= -canvas.width) bgOffsetX = 0;
 
-        // Nubes con volumen
+        ctx.fillStyle = "#ffffff";
         for (let i = 0; i < 2; i++) {
             let offset = bgOffsetX + (i * canvas.width);
-            
-            // Sombras de las nubes
-            ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
-            ctx.beginPath(); ctx.arc(offset + 82, 105, 30, 0, Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.arc(offset + 122, 115, 40, 0, Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.arc(offset + 162, 105, 30, 0, Math.PI*2); ctx.fill();
-            
-            // Luces de las nubes
-            ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
-            ctx.beginPath(); ctx.arc(offset + 80, 100, 30, 0, Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.arc(offset + 120, 110, 40, 0, Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.arc(offset + 160, 100, 30, 0, Math.PI*2); ctx.fill();
-            
-            // Segundo grupo de nubes
-            ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
-            ctx.beginPath(); ctx.arc(offset + 280, 200, 25, 0, Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.arc(offset + 310, 210, 35, 0, Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.arc(offset + 340, 200, 25, 0, Math.PI*2); ctx.fill();
+            // Nube 1 bloque
+            ctx.fillRect(offset + 60, 80, 80, 30);
+            ctx.fillRect(offset + 80, 60, 40, 70);
+            // Nube 2 bloque
+            ctx.fillRect(offset + 260, 180, 60, 20);
+            ctx.fillRect(offset + 270, 170, 40, 40);
         }
         
-        // Suelo texturizado y en movimiento
-        let groundY = canvas.height - 30;
+        // Suelo Pixel Art
+        let groundY = canvas.height - 40;
         
-        // Tierra
-        ctx.fillStyle = "#8b5a2b"; 
-        ctx.fillRect(0, groundY + 10, canvas.width, 20);
+        // Base tierra
+        ctx.fillStyle = "#d8a038"; 
+        ctx.fillRect(0, groundY + 12, canvas.width, 28);
         
-        // Pasto base
-        ctx.fillStyle = "#4ade80"; 
-        ctx.fillRect(0, groundY, canvas.width, 10);
+        // Pasto superior
+        ctx.fillStyle = "#54ca2f"; 
+        ctx.fillRect(0, groundY, canvas.width, 12);
         
-        // Briznas de pasto moviéndose (Parallax más rápido)
-        ctx.strokeStyle = "#16a34a";
-        ctx.lineWidth = 2;
+        // Borde negro separador
+        ctx.fillStyle = "#222";
+        ctx.fillRect(0, groundY, canvas.width, 4);
+
+        // Patrón de césped animado (cuadritos)
+        let grassOffset = (bgOffsetX * 5) % 30;
+        ctx.fillStyle = "#3da11d";
+        for (let x = grassOffset - 30; x < canvas.width; x += 30) {
+            ctx.fillRect(x, groundY + 4, 8, 8);
+        }
+        // Detalles de tierra
+        ctx.fillStyle = "#c08020";
+        for (let x = grassOffset - 30; x < canvas.width; x += 40) {
+            ctx.fillRect(x + 10, groundY + 20, 12, 8);
+            ctx.fillRect(x + 25, groundY + 30, 8, 8);
+        }
+    }
+
+    // Dibujar la casita y el buzón (Escena final)
+    function drawEndScene() {
+        if (!endScene.active) return;
+        
+        let x = endScene.x;
+        let groundY = canvas.height - 40;
+
+        // --- CASITA PIXEL ART ---
+        // Pared blanca
+        drawPixelBlock(x + 60, groundY - 70, 80, 70, "#fffafa");
+        // Techo rojo
+        ctx.fillStyle = "#e11d48";
         ctx.beginPath();
-        let scrollGrass = (bgOffsetX * 6) % 20; // Se mueve más rápido que las nubes
-        for (let x = scrollGrass; x < canvas.width + 20; x += 20) {
-            ctx.moveTo(x, groundY + 10);
-            ctx.lineTo(x + 5, groundY + 2);
-        }
+        ctx.moveTo(x + 50, groundY - 70);
+        ctx.lineTo(x + 100, groundY - 110);
+        ctx.lineTo(x + 150, groundY - 70);
+        ctx.fill();
+        ctx.strokeStyle = "#222"; ctx.lineWidth = 4;
         ctx.stroke();
+        // Puerta
+        drawPixelBlock(x + 85, groundY - 35, 20, 35, "#a16207");
+        ctx.fillStyle = "#fbbf24"; ctx.fillRect(x + 90, groundY - 20, 4, 4); // perilla
+        // Ventana
+        drawPixelBlock(x + 115, groundY - 50, 16, 16, "#38bdf8");
+        ctx.fillStyle = "#222"; ctx.fillRect(x + 122, groundY - 50, 2, 16); // marco
+        ctx.fillRect(x + 115, groundY - 43, 16, 2);
+
+        // --- BUZÓN PIXEL ART ---
+        let mailX = x + 10;
+        // Poste
+        drawPixelBlock(mailX + 6, groundY - 30, 8, 30, "#737373");
+        // Caja del buzón
+        drawPixelBlock(mailX, groundY - 45, 20, 15, "#3b82f6");
+        // Bandera roja
+        drawPixelBlock(mailX + 18, groundY - 55, 4, 10, "#ef4444");
+
+        // --- CARTA CAYENDO (Fase 3) ---
+        if (finalPhase === 3) {
+            drawLetter(bird.x + 10, endScene.letterDropY);
+        }
+    }
+
+    function drawLetter(x, y) {
+        ctx.save();
+        ctx.translate(x, y);
+        drawPixelBlock(-8, -6, 16, 12, "#ffffff");
+        // Sobre
+        ctx.strokeStyle = "#222"; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(-8, -6); ctx.lineTo(0, 0); ctx.lineTo(8, -6); ctx.stroke();
+        // Corazón pixel
+        ctx.fillStyle = "#e11d48";
+        ctx.fillRect(-2, 0, 4, 4);
+        ctx.restore();
     }
 
     function update() {
+        let scrollSpeed = 1.4;
+
         if (gameActive) {
             bird.v += bird.g;
             bird.y += bird.v;
 
-            // Chocar con el suelo de textura (-30 de altura)
-            if (bird.y + bird.r > canvas.height - 30 || bird.y - bird.r < 0) {
+            // Chocar con el suelo de textura (-40)
+            if (bird.y + bird.r > canvas.height - 40 || bird.y - bird.r < 0) {
                 gameActive = false;
-                mostrarMensaje("💥 ¡Ups! Chocaste. Haz clic para reiniciar, mi amor.");
+                mostrarMensaje("💥 ¡Ups! Chocaste. Haz clic para reiniciar.");
             }
 
-            if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 250) {
+            if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 200) {
                 spawnPipe();
             }
 
             for (let i = pipes.length - 1; i >= 0; i--) {
-                pipes[i].x -= 1.4; 
+                pipes[i].x -= scrollSpeed; 
 
-                let birdHitboxR = bird.r - 3; 
-                if (bird.x + birdHitboxR > pipes[i].x && bird.x - birdHitboxR < pipes[i].x + 60) {
-                    if (bird.y - birdHitboxR < pipes[i].top || bird.y + birdHitboxR > canvas.height - pipes[i].bottom) {
+                // Hitbox cuadrada para Pixel Art
+                let hx = bird.x - 10;
+                let hy = bird.y - 10;
+                let hw = 20; let hh = 20;
+
+                if (hx + hw > pipes[i].x && hx < pipes[i].x + 60) {
+                    if (hy < pipes[i].top || hy + hh > canvas.height - pipes[i].bottom) {
                         gameActive = false;
                         mostrarMensaje("💥 ¡Casi! Inténtalo de nuevo, mi vida.");
                     }
@@ -311,8 +373,10 @@ juego_html = """
                     
                     if (score >= 10) {
                         gameActive = false; 
-                        finalAnimationPhase = 1; 
+                        finalPhase = 1; // Inicia secuencia de la casa
                         document.getElementById("mensaje").style.display = "none";
+                        endScene.active = true;
+                        endScene.x = canvas.width + 50; // Aparece por la derecha
                     } else if (mensajes[score]) {
                         mostrarMensaje(mensajes[score]);
                     }
@@ -321,20 +385,40 @@ juego_html = """
                 if (pipes[i].x + 60 < 0) pipes.splice(i, 1);
             }
             
-        } else if (finalAnimationPhase === 1) {
-            let targetX = canvas.width / 2;
-            let targetY = canvas.height / 2;
+        } else if (finalPhase === 1) {
+            // Fase 1: La casa se acerca, el pajarito se estabiliza
+            bird.v += bird.g;
+            bird.y += bird.v;
+            if (bird.y > canvas.height - 120) bird.v = -2; // Mini saltitos para mantenerse
             
-            bird.x += (targetX - bird.x) * 0.04;
-            bird.y += (targetY - bird.y) * 0.04;
-            bird.v = 0; 
-            
-            for (let i = pipes.length - 1; i >= 0; i--) {
-                pipes[i].x -= 1.4;
-            }
+            endScene.x -= scrollSpeed;
+            for (let i = pipes.length - 1; i >= 0; i--) { pipes[i].x -= scrollSpeed; }
 
-            if (Math.abs(bird.x - targetX) < 1 && Math.abs(bird.y - targetY) < 1) {
-                finalAnimationPhase = 2;
+            // Cuando el buzón está en una buena posición, paramos el scroll
+            if (endScene.x <= canvas.width / 2 + 20) {
+                finalPhase = 2; // Ir hacia el buzón
+            }
+        } else if (finalPhase === 2) {
+            // Fase 2: Pajarito vuela directo al buzón
+            let targetX = endScene.x - 5; // Arriba del buzón
+            let targetY = canvas.height - 40 - 55; 
+            
+            bird.x += (targetX - bird.x) * 0.05;
+            bird.y += (targetY - bird.y) * 0.05;
+            
+            if (Math.abs(bird.x - targetX) < 2 && Math.abs(bird.y - targetY) < 2) {
+                finalPhase = 3; // Soltar carta
+                endScene.letterDropY = bird.y + 6;
+            }
+        } else if (finalPhase === 3) {
+            // Fase 3: Carta cae al buzón
+            endScene.letterDropY += 3;
+            // Pajarito hace un saltito feliz
+            bird.y += Math.sin(Date.now() / 100) * 1.5;
+
+            // Si la carta entra al buzón
+            if (endScene.letterDropY > canvas.height - 40 - 45) {
+                finalPhase = 4;
                 let carta = document.getElementById("carta-final");
                 carta.style.display = "block";
                 carta.classList.add("abrir-carta");
@@ -349,154 +433,94 @@ juego_html = """
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawBackground();
 
-        // DIBUJAR TUBERÍAS CON TEXTURAS 3D
+        // DIBUJAR TUBERÍAS PIXEL ART
         pipes.forEach(p => {
-            let pipeGrad = ctx.createLinearGradient(p.x, 0, p.x + 60, 0);
-            if (p.esUltima) {
-                pipeGrad.addColorStop(0, "#ef4444"); 
-                pipeGrad.addColorStop(0.7, "#dc2626"); 
-                pipeGrad.addColorStop(1, "#991b1b");
-            } else {
-                pipeGrad.addColorStop(0, "#22c55e"); 
-                pipeGrad.addColorStop(0.7, "#16a34a"); 
-                pipeGrad.addColorStop(1, "#14532d"); 
-            }
-            ctx.fillStyle = pipeGrad;
+            let color = p.esUltima ? "#ef4444" : "#4ade80"; // Rojo o Verde
+            let highlight = p.esUltima ? "#fca5a5" : "#86efac";
             
-            // Cuerpo del tubo
-            ctx.fillRect(p.x, 0, 60, p.top);
-            ctx.fillRect(p.x, canvas.height - p.bottom, 60, p.bottom);
-            
-            // Brillo izquierdo para efecto 3D
-            ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
-            ctx.fillRect(p.x + 4, 0, 8, p.top);
-            ctx.fillRect(p.x + 4, canvas.height - p.bottom, 8, p.bottom);
+            // Cuerpo superior
+            drawPixelBlock(p.x, 0, 60, p.top, color);
+            ctx.fillStyle = highlight; ctx.fillRect(p.x + 6, 0, 8, p.top - 4); // Brillo
 
-            // Tapas del tubo
-            ctx.fillStyle = pipeGrad;
-            ctx.fillRect(p.x - 5, p.top - 25, 70, 25);
-            ctx.strokeRect(p.x - 5, p.top - 25, 70, 25);
-            ctx.fillRect(p.x - 5, canvas.height - p.bottom, 70, 25);
-            ctx.strokeRect(p.x - 5, canvas.height - p.bottom, 70, 25);
-            
-            // Brillos en las tapas
-            ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
-            ctx.fillRect(p.x - 1, p.top - 25, 8, 25);
-            ctx.fillRect(p.x - 1, canvas.height - p.bottom, 8, 25);
+            // Tapa superior
+            drawPixelBlock(p.x - 4, p.top - 24, 68, 24, color);
+            ctx.fillStyle = highlight; ctx.fillRect(p.x + 2, p.top - 20, 8, 16);
+
+            // Cuerpo inferior
+            drawPixelBlock(p.x, canvas.height - p.bottom, 60, p.bottom, color);
+            ctx.fillStyle = highlight; ctx.fillRect(p.x + 6, canvas.height - p.bottom + 4, 8, p.bottom);
+
+            // Tapa inferior
+            drawPixelBlock(p.x - 4, canvas.height - p.bottom, 68, 24, color);
+            ctx.fillStyle = highlight; ctx.fillRect(p.x + 2, canvas.height - p.bottom + 4, 8, 16);
         });
 
+        drawEndScene();
+
         // CARTA EN EL SUELO (Antes de empezar)
-        if (!gameActive && finalAnimationPhase === 0 && pipes.length === 0) {
-            ctx.save();
-            ctx.translate(bird.x + 28, bird.y + 6); 
-            
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(-7, -5, 14, 10);
-            ctx.strokeStyle = "#db2777";
-            ctx.lineWidth = 1;
-            ctx.strokeRect(-7, -5, 14, 10);
-            
-            ctx.beginPath(); ctx.moveTo(-7, -5); ctx.lineTo(0, 0); ctx.lineTo(7, -5); ctx.stroke();
-            
-            ctx.fillStyle = "#ef4444"; ctx.font = "8px sans-serif"; ctx.fillText("❤", -3, 3);
-            ctx.restore();
+        if (!gameActive && finalPhase === 0 && pipes.length === 0) {
+            drawLetter(bird.x + 35, bird.y + 12);
         }
 
-        // DIBUJAR PAJARITO 
-        if (finalAnimationPhase < 2) {
-            ctx.save();
-            ctx.translate(bird.x, bird.y);
-            let rotation = 0;
-            if (gameActive) {
-                rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, (bird.v * 0.1)));
-            }
-            ctx.rotate(rotation);
+        // DIBUJAR PAJARITO PIXEL ART
+        ctx.save();
+        ctx.translate(bird.x, bird.y);
+        
+        let rot = 0;
+        if (gameActive) rot = Math.min(Math.PI / 6, Math.max(-Math.PI / 6, (bird.v * 0.1)));
+        ctx.rotate(rot);
 
-            // Cuerpo con sombra
-            ctx.shadowBlur = 4;
-            ctx.shadowColor = "rgba(0,0,0,0.3)";
-            let birdGrad = ctx.createRadialGradient(-3, -3, 2, 0, 0, bird.r);
-            birdGrad.addColorStop(0, "#fffbe1");
-            birdGrad.addColorStop(1, "#fde047");
-            ctx.fillStyle = birdGrad;
-            ctx.beginPath();
-            ctx.arc(0, 0, bird.r, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.shadowBlur = 0; // Quitar sombra para los detalles
-            
-            ctx.strokeStyle = "#ca8a04";
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
+        let s = 3; // Escala del pixel art del ave
+        
+        // Cuerpo (Caja amarilla con borde negro)
+        drawPixelBlock(-4*s, -3*s, 8*s, 7*s, "#fde047");
+        
+        // Ojo
+        ctx.fillStyle = "#222"; ctx.fillRect(1*s, -1.5*s, 1.5*s, 2*s);
+        
+        // Pico
+        drawPixelBlock(4*s, 0, 3*s, 2.5*s, "#f97316");
+        
+        // Ala (Movimiento según si sube o baja)
+        let wingY = (bird.v < 0) ? -1*s : 1*s;
+        drawPixelBlock(-3*s, wingY, 4*s, 3*s, "#ffffff");
 
-            // Ojo
-            ctx.fillStyle = "#333";
-            ctx.beginPath();
-            ctx.arc(4, -4, 3, 0, Math.PI * 2);
-            ctx.fill();
+        // CARTA VOLADORA (Agarrada en el aire, excepto en fase 3 y 4)
+        if ((gameActive || finalPhase === 1 || finalPhase === 2) && pipes.length > 0 || (finalPhase>0 && finalPhase<3)) {
+            ctx.translate(2*s, 4*s); 
+            ctx.rotate(Math.PI / 6);
+            drawLetter(0, 0);
+        }
+        ctx.restore(); 
+        
+        // MARCADOR PIXEL
+        if (finalPhase < 4) {
             ctx.fillStyle = "#fff";
-            ctx.beginPath();
-            ctx.arc(5, -5, 1, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Pico
-            ctx.fillStyle = "#f97316";
-            ctx.beginPath();
-            ctx.moveTo(10, -2);
-            ctx.lineTo(18, 1);
-            ctx.lineTo(10, 4);
-            ctx.fill();
-            ctx.stroke();
-
-            // Ala
-            ctx.fillStyle = "#fef08a";
-            ctx.beginPath();
-            ctx.ellipse(-4, 2, 7, 4, -0.2, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-
-            // CARTA VOLADORA 
-            if (gameActive || finalAnimationPhase === 1) {
-                ctx.save();
-                ctx.translate(6, 6); 
-                ctx.rotate(Math.PI / 8);
-                
-                ctx.fillStyle = "#ffffff";
-                ctx.fillRect(0, 0, 14, 10);
-                ctx.strokeStyle = "#db2777";
-                ctx.lineWidth = 1;
-                ctx.strokeRect(0, 0, 14, 10);
-                
-                ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(7, 5); ctx.lineTo(14, 0); ctx.stroke();
-                
-                ctx.fillStyle = "#ef4444"; ctx.font = "8px sans-serif"; ctx.fillText("❤", 4, 8);
-                ctx.restore(); 
-            }
-            
-            ctx.restore(); 
-            
-            // MARCADOR 
-            ctx.fillStyle = "#fff";
-            ctx.font = "bold 28px 'Segoe UI', sans-serif";
-            ctx.shadowBlur = 5;
-            ctx.shadowColor = "rgba(0,0,0,0.5)";
-            ctx.fillText("Nivel: " + score, 15, 40);
-            ctx.shadowBlur = 0; 
+            ctx.font = "bold 24px 'Courier New', monospace";
+            ctx.shadowBlur = 0;
+            // Borde del texto estilo retro
+            ctx.strokeStyle = "#222";
+            ctx.lineWidth = 4;
+            ctx.strokeText("Nivel: " + score, 15, 35);
+            ctx.fillText("Nivel: " + score, 15, 35);
         }
 
         // TEXTO DE INICIO
-        if (!gameActive && pipes.length === 0 && finalAnimationPhase === 0) {
-            ctx.fillStyle = "rgba(0,0,0,0.2)";
+        if (!gameActive && pipes.length === 0 && finalPhase === 0) {
+            ctx.fillStyle = "rgba(0,0,0,0.5)";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = "#fff";
-            ctx.font = "bold 24px 'Segoe UI', sans-serif";
+            ctx.font = "bold 18px 'Courier New', monospace";
             ctx.textAlign = "center";
-            ctx.shadowBlur = 8;
-            ctx.shadowColor = "#000";
             
-            ctx.fillText("Haz clic o presiona espacio", canvas.width/2, 180);
-            ctx.fillText("para recoger la carta ❤️", canvas.width/2, 215);
+            // Texto con contorno retro
+            ctx.strokeStyle = "#222"; ctx.lineWidth = 4;
+            ctx.strokeText("Haz clic o presiona", canvas.width/2, 180);
+            ctx.fillText("Haz clic o presiona", canvas.width/2, 180);
+            
+            ctx.strokeText("espacio para volar ❤️", canvas.width/2, 215);
+            ctx.fillText("espacio para volar ❤️", canvas.width/2, 215);
             ctx.textAlign = "left"; 
-            ctx.shadowBlur = 0;
         }
     }
 
